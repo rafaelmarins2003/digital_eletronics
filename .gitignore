@@ -1,0 +1,80 @@
+# --------------------------------------------------------------------------- #
+# Quartus II / Intel FPGA .gitignore
+# --------------------------------------------------------------------------- #
+
+# Pastas geradas pelo Quartus (cache/compilação/saídas) - regeneráveis
+db/
+incremental_db/
+output_files/
+simulation/
+
+# Arquivos de workspace/sessão (estado da GUI, específico por usuário/máquina)
+*.qws
+*.qws.bak
+*.qarf
+*.qarlog
+*.rpt_lock
+
+# Bitstreams e arquivos de programação (binários gerados pelo fitter/asm)
+*.sof
+*.pof
+*.rbf
+*.svf
+*.jam
+*.jbc
+*.cdf
+
+# Relatórios e resumos de compilação (gerados a cada build)
+*.rpt
+*.summary
+*.smsg
+*.flow
+*.jdi
+*.done
+*.pin
+*.asm_labs.ddb
+*.fit.smsg
+
+# Saídas da simulação EDA (ModelSim-Altera) - geradas via EDA Netlist Writer
+*.vho
+*.sdo
+*.sft
+*.xrf
+*.vo
+
+# Backups criados pelo Quartus
+*.bak
+*.vhd.bak
+*.qsf.bak
+*.qpf.bak
+
+# Arquivos temporários/auxiliares do compilador (caso soltem fora das pastas)
+*.cdb
+*.hdb
+*.rdb
+*.tdb
+*.idb
+*.logdb
+*.bpm
+*.kpt
+*.ammdb
+*.dpi
+*.hb_info
+*.sig
+*.sci
+*.hif
+*.hier_info
+*.ipinfo
+*.tmw_info
+*.db_info
+*.hsd
+*.dat
+*.ddb
+*.qmsg
+*.rcfdb
+*.pt
+*.txt
+!**/*.qpf
+!**/*.qsf
+!**/*.qdf
+!**/*.vhd
