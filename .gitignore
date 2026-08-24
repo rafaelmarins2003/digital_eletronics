@@ -7,6 +7,9 @@ db/
 incremental_db/
 output_files/
 simulation/
+!**/simulation/
+**/simulation/*
+!**/simulation/*.vwf
 
 # Arquivos de workspace/sessão (estado da GUI, específico por usuário/máquina)
 *.qws
