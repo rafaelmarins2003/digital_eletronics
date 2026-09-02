@@ -1,0 +1,57 @@
+$date
+	Mon Aug 31 22:51:53 2026
+$end
+$version
+	ModelSim Version 10.1d
+$end
+$timescale
+	1ps
+$end
+$scope module soma_1a $end
+$var wire 1 ! a $end
+$var wire 1 " b $end
+$var wire 1 # ve $end
+$var wire 1 $ s $end
+$var wire 1 % vs $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0!
+0"
+0#
+0$
+0%
+$end
+#100000
+1#
+1$
+#200000
+1"
+0#
+#300000
+1#
+1%
+0$
+#400000
+1!
+0"
+0#
+0%
+1$
+#500000
+1#
+1%
+0$
+#600000
+1"
+0#
+#700000
+1#
+1$
+#800000
+0!
+0"
+0#
+0%
+0$

@@ -1,0 +1,69 @@
+#!/bin/bash
+# Wrapper do vsim do ModelSim-Altera 10.1d para o NativeLink do Quartus 13.1.
+# Cobre:
+#  1. vsim imprime warning ADDR_NO_RANDOMIZE no stderr; o Tcl exec do
+#     quartus_sh trata stderr como erro e aborta o NativeLink -> silenciar.
+#  2. Sem testbench no projeto, o .do do NativeLink apenas compila; este
+#     wrapper completa o fluxo: carrega o top-level do projeto, aplica as
+#     forcas (contagem binaria), roda, grava VCD e abre o GTKWave do host.
+#  3. O wrapper Tcl original do vsim morre com EOF sem terminal -> vish direto.
+VDIR=/home/rafaelmf/altera/13.1/modelsim_ase/linuxaloem
+
+if [ "$1" = "-version" ]; then
+    exec "$VDIR/vsim" -version 2>/dev/null
+fi
+
+if [ "$1" = "-i" ]; then
+    shift
+    DOFILE=""; ARGS=()
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -do) DOFILE="$2"; shift 2 ;;
+            -l)  shift 2 ;;
+            *)   ARGS+=("$1"); shift ;;
+        esac
+    done
+    # descobre o diretorio do projeto: cwd do quartus_sh
+    PROJDIR="$(pwd)"
+    # nome do VCD: topo do projeto (ou padrao)
+    TOP="${SIM_TOP:-}"
+    if [ -z "$TOP" ]; then
+        for qsf in "$PROJDIR"/*.qsf; do
+            [ -f "$qsf" ] || continue
+            TOP=$(sed -n "s/^set_global_assignment -name TOP_LEVEL_ENTITY *//p" "$qsf" | head -1 | tr -d " \r")
+            [ -n "$TOP" ] && break
+        done
+    fi
+    TOP="${TOP:-soma_1a}"
+    VCD="$PROJDIR/$TOP.vcd"
+    RUN_NS="${SIM_RUN_NS:-800}"
+
+    WORKDO="/tmp/nl_shim_$$.do"
+    [ -n "$DOFILE" ] && cp "$DOFILE" "$WORKDO"
+    # garante que o .do rode a partir do diretorio do projeto
+    cat >> "$WORKDO" <<EODO
+cd $PROJDIR
+vsim -t 1ps work.$TOP
+vcd file $VCD
+vcd add -r /*
+force a 0 0ns, 1 400ns -repeat 800ns
+force b 0 0ns, 1 200ns -repeat 400ns
+force ve 0 0ns, 1 100ns -repeat 200ns
+run $RUN_NS ns
+vcd flush
+quit -f
+EODO
+    script -qc "$VDIR/vsim -c -do $WORKDO" /dev/null >/dev/null 2>&1
+    rm -f "$WORKDO" "$PROJDIR/transcript"
+    # registra o resultado no log do NativeLink (aparece no Messages do Quartus)
+    echo "Info: VCD com as formas de onda gerado: $VCD" >&2
+    echo "Info: Abra com: GDK_BACKEND=x11 gtkwave $VCD" >&2
+    # se houver gtkwave disponivel neste ambiente, abre direto
+    if command -v gtkwave >/dev/null 2>&1; then
+        GDK_BACKEND=x11 nohup gtkwave "$VCD" >/dev/null 2>&1 &
+    fi
+    exit 0
+fi
+
+# demais usos (ex.: -c batch): repassa com stderr limpo
+exec "$VDIR/vish" "$@" 2>/dev/null

@@ -1,0 +1,11 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY part1 IS
+PORT (SW : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		LEDG : OUT STD_LOGIC_VECTOR(9 DOWNTO 0));
+END part1;
+
+ARCHITECTURE hardware OF part1 IS
+BEGIN LEDG <= SW;
+END hardware;
