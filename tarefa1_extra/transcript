@@ -1,0 +1,15 @@
+# vsim -do {vcd file /home/rafaelmf/quartus/tarefa1_extra/extra.vcd; vcd add -r /*; run 1025 ns; quit -f} -lib /tmp/tarefa1_extra_sim.S5m8cM/work -c extra_tb 
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading /tmp/tarefa1_extra_sim.S5m8cM/work.extra_tb(test)
+# Loading /tmp/tarefa1_extra_sim.S5m8cM/work.extra(structural)
+# Loading /tmp/tarefa1_extra_sim.S5m8cM/work.mux3_2bit(behavioral)
+# Loading /tmp/tarefa1_extra_sim.S5m8cM/work.char_7seg(rtl)
+# vcd file /home/rafaelmf/quartus/tarefa1_extra/extra.vcd 
+#  vcd add -r /* 
+#  run 1025 ns 
+# ** Note: Atividade Extra: todas as 1024 combinacoes aprovadas
+#    Time: 1024 ns  Iteration: 0  Instance: /extra_tb
+#  quit -f 

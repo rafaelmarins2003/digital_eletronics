@@ -4,10 +4,13 @@
 #  1. vsim imprime warning ADDR_NO_RANDOMIZE no stderr; o Tcl exec do
 #     quartus_sh trata stderr como erro e aborta o NativeLink -> silenciar.
 #  2. Sem testbench no projeto, o .do do NativeLink apenas compila; este
-#     wrapper completa o fluxo: carrega o top-level do projeto, aplica as
-#     forcas (contagem binaria), roda, grava VCD e abre o GTKWave do host.
+#     wrapper completa o fluxo: carrega o top-level do projeto, aplica forcas
+#     automaticas (contagem binaria nas entradas), roda, grava VCD e abre o
+#     GTKWave do host.
 #  3. O wrapper Tcl original do vsim morre com EOF sem terminal -> vish direto.
 VDIR=/home/rafaelmf/altera/13.1/modelsim_ase/linuxaloem
+# vish/vsim 32-bit precisam das libs ncurses5/tinfo5 32-bit do altera/compat
+export LD_LIBRARY_PATH="/home/rafaelmf/altera/compat:${LD_LIBRARY_PATH:-}"
 
 if [ "$1" = "-version" ]; then
     exec "$VDIR/vsim" -version 2>/dev/null
@@ -23,9 +26,17 @@ if [ "$1" = "-i" ]; then
             *)   ARGS+=("$1"); shift ;;
         esac
     done
-    # descobre o diretorio do projeto: cwd do quartus_sh
+
+    # Diretorio do projeto: o NativeLink invoca este wrapper a partir de
+    # simulation/modelsim, entao sobe ate achar o diretorio com o .qsf.
     PROJDIR="$(pwd)"
-    # nome do VCD: topo do projeto (ou padrao)
+    d="$PROJDIR"
+    while [ "$d" != "/" ]; do
+        if ls "$d"/*.qsf >/dev/null 2>&1; then PROJDIR="$d"; break; fi
+        d="$(dirname "$d")"
+    done
+
+    # nome do topo: SIM_TOP, ou TOP_LEVEL_ENTITY do .qsf
     TOP="${SIM_TOP:-}"
     if [ -z "$TOP" ]; then
         for qsf in "$PROJDIR"/*.qsf; do
@@ -38,32 +49,136 @@ if [ "$1" = "-i" ]; then
     VCD="$PROJDIR/$TOP.vcd"
     RUN_NS="${SIM_RUN_NS:-800}"
 
+    # Roda no simulation/modelsim quando existir (la ficam o modelsim.ini e o
+    # rtl_work do NativeLink); invocacao manual cai no diretorio do projeto.
+    if [ -d "$PROJDIR/simulation/modelsim" ]; then
+        cd "$PROJDIR/simulation/modelsim" || exit 0
+    fi
+    # modelsim.ini local para o vmap nao mexer no master da instalacao.
+    # O quartus_sh/NativeLink define MODELSIM apontando para o master read-only
+    # -> unset para o vsim usar o ./modelsim.ini daqui (editavel).
+    unset MODELSIM
+    MSSI="./modelsim.ini"
+    if [ ! -f "$MSSI" ] || [ ! -w "$MSSI" ]; then
+        rm -f "$MSSI"
+        cp "${VDIR%/linuxaloem}/modelsim.ini" "$MSSI" 2>/dev/null || true
+        chmod u+w "$MSSI" 2>/dev/null || true
+    fi
+    MSSIARG=""
+    [ -n "$DOFILE" ] && MSSIARG="-modelsimini $MSSI"
+
+    # Portas de entrada do topo: do .vhd que declara a entity, ou do netlist
+    SRCFILES=()
+    for f in "$PROJDIR"/*.vhd; do
+        if [ -f "$f" ] && grep -qiE "entity[ \t]+$TOP([ \t]+is|[ \t]*$)" "$f"; then
+            SRCFILES+=("$f"); break
+        fi
+    done
+    if [ ${#SRCFILES[@]} -eq 0 ]; then
+        for cand in "$PROJDIR"/simulation/modelsim/*.vho; do
+            [ -f "$cand" ] && SRCFILES+=("$cand")
+        done
+    fi
+
+    # nome bit_alto bit_baixo eh_vetor de cada porta de entrada (sem duplicar)
+    PORTS=$(cat "${SRCFILES[@]}" 2>/dev/null | awk '
+        /^[ \t]*--/ { next }
+        /:[ \t]*[iI][nN][ \t]+/ {
+            line=$0
+            sub(/--.*/, "", line)
+            split(line, seg, ":")
+            names=seg[1]
+            gsub(/[ \t]/, "", names)
+            # remove prefixo PORT( herdado de "PORT (a, b : IN ...)"
+            sub(/^[Pp][Oo][Rr][Tt]\(/, "", names)
+            n=split(names, arr, ",")
+            type=seg[2]
+            high=0; low=0; isvec=0
+            if (match(type, /[0-9]+[ \t]*(DOWNTO|downto|TO|to)[ \t]*[0-9]+/)) {
+                rng=substr(type, RSTART, RLENGTH)
+                split(rng, bounds, /(DOWNTO|downto|TO|to)/)
+                gsub(/[ \t]/, "", bounds[1]); gsub(/[ \t]/, "", bounds[2])
+                high=bounds[1]; low=bounds[2]; isvec=1
+            }
+            for (i=1; i<=n; i++) {
+                nm=arr[i]
+                if (nm=="" || (nm in seen)) continue
+                seen[nm]=1
+                if (nm ~ /CLOCK|CLK|RESET|RST/) continue
+                print nm, high, low, isvec
+            }
+        }')
+
+    # Forcas: contagem binaria - cada bit dobra o periodo do anterior.
+    # SIM_FORCE substitui tudo (comandos force separados por ';').
+    FORCE_CMDS=""
+    if [ -n "${SIM_FORCE:-}" ]; then
+        FORCE_CMDS="${SIM_FORCE//;/$'\n'}"
+    else
+        BASE_NS=50
+        NBITS_TOTAL=0
+        while read -r pname high low isvec; do
+            if [ "$isvec" = "1" ]; then
+                nb=$(( high - low + 1 ))
+                NBITS_TOTAL=$(( NBITS_TOTAL + nb ))
+                for b in $(seq "$low" "$high"); do
+                    w=$(( b - low ))
+                    half=$(( BASE_NS * (2**w) ))
+                    FORCE_CMDS+="force $pname($b) 0 0ns, 1 ${half}ns -repeat $((half*2))ns"$'\n'
+                done
+            else
+                NBITS_TOTAL=$(( NBITS_TOTAL + 1 ))
+                FORCE_CMDS+="force $pname 0 0ns, 1 ${BASE_NS}ns -repeat $((BASE_NS*2))ns"$'\n'
+            fi
+        done <<< "$PORTS"
+        # garante tempo p/ o bit mais lento completar um ciclo inteiro
+        if [ "$NBITS_TOTAL" -gt 0 ]; then
+            NEED=$(( BASE_NS * (2**(NBITS_TOTAL+1)) ))
+            [ "$NEED" -gt "$RUN_NS" ] && RUN_NS=$NEED
+        fi
+    fi
+
     WORKDO="/tmp/nl_shim_$$.do"
-    [ -n "$DOFILE" ] && cp "$DOFILE" "$WORKDO"
-    # garante que o .do rode a partir do diretorio do projeto
+    : > "$WORKDO"
+    # compilacao (reusa o .do do NativeLink se houver, senao compila tudo)
+    if [ -n "$DOFILE" ] && [ -f "$DOFILE" ]; then
+        cat "$DOFILE" >> "$WORKDO"
+    else
+        cat >> "$WORKDO" <<EODO
+vlib rtl_work
+vmap work rtl_work
+EODO
+        for f in "$PROJDIR"/*.vhd; do
+            [ -f "$f" ] && echo "vcom -93 -work work {$f}" >> "$WORKDO"
+        done
+    fi
     cat >> "$WORKDO" <<EODO
-cd $PROJDIR
-vsim -t 1ps work.$TOP
+vsim -t 1ps $MSSIARG work.$TOP
 vcd file $VCD
 vcd add -r /*
-force a 0 0ns, 1 400ns -repeat 800ns
-force b 0 0ns, 1 200ns -repeat 400ns
-force ve 0 0ns, 1 100ns -repeat 200ns
+EODO
+    printf '%s' "$FORCE_CMDS" >> "$WORKDO"
+    cat >> "$WORKDO" <<EODO
 run $RUN_NS ns
 vcd flush
 quit -f
 EODO
-    script -qc "$VDIR/vsim -c -do $WORKDO" /dev/null >/dev/null 2>&1
-    rm -f "$WORKDO" "$PROJDIR/transcript"
-    # registra o resultado no log do NativeLink (aparece no Messages do Quartus)
-    echo "Info: VCD com as formas de onda gerado: $VCD" >&2
-    echo "Info: Abra com: GDK_BACKEND=x11 gtkwave $VCD" >&2
-    # se houver gtkwave disponivel neste ambiente, abre direto
-    if command -v gtkwave >/dev/null 2>&1; then
-        GDK_BACKEND=x11 nohup gtkwave "$VCD" >/dev/null 2>&1 &
+    PDIR="$(cd "$(dirname "$0")" && pwd)"
+    timeout 170 "$PDIR/runpty.py" "$VDIR/vsim" -c -do "$WORKDO" >/dev/null 2>&1
+    rm -f "$WORKDO" transcript msim_transcript
+    if [ -s "$VCD" ]; then
+        # registra o resultado no log do NativeLink (aparece no Messages do Quartus)
+        echo "Info: VCD com as formas de onda gerado: $VCD" >&2
+        echo "Info: Abra com: GDK_BACKEND=x11 gtkwave $VCD" >&2
+        # se houver gtkwave disponivel neste ambiente, abre direto
+        if command -v gtkwave >/dev/null 2>&1; then
+            GDK_BACKEND=x11 nohup gtkwave "$VCD" >/dev/null 2>&1 &
+        fi
+    else
+        echo "Error: simulacao nao gerou o VCD ($VCD)" >&2
     fi
     exit 0
 fi
 
-# demais usos (ex.: -c batch): repassa com stderr limpo
+# demais usos (ex. -c batch): repassa com stderr limpo
 exec "$VDIR/vish" "$@" 2>/dev/null
