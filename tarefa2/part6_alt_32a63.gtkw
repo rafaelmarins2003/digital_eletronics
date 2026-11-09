@@ -1,0 +1,25 @@
+[*] GTKWave save file - Parte 6 alternativa: SW = 32 a 63
+[dumpfile] "/home/rafaelmf/quartus/tarefa2/part6_alt.vcd"
+[timestart] 1600000
+[size] 1920 1000
+[pos] -1 -1
+*-10.100000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 200
+[signals_width] 160
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@24
+#{part6_alt.SW[5:0]} part6_alt.SW[5] part6_alt.SW[4] part6_alt.SW[3] part6_alt.SW[2] part6_alt.SW[1] part6_alt.SW[0]
+#{part6_alt.e3[3:0]} part6_alt.e3[3] part6_alt.e3[2] part6_alt.e3[1] part6_alt.e3[0]
+#{part6_alt.c3[3:0]} part6_alt.c3[3] part6_alt.c3[2] part6_alt.c3[1] part6_alt.c3[0]
+#{part6_alt.e5[3:0]} part6_alt.e5[3] part6_alt.e5[2] part6_alt.e5[1] part6_alt.e5[0]
+#{part6_alt.c5[3:0]} part6_alt.c5[3] part6_alt.c5[2] part6_alt.c5[1] part6_alt.c5[0]
+#{part6_alt.e7[3:0]} part6_alt.e7[3] part6_alt.e7[2] part6_alt.e7[1] part6_alt.e7[0]
+#{part6_alt.c7[3:0]} part6_alt.c7[3] part6_alt.c7[2] part6_alt.c7[1] part6_alt.c7[0]
+#{part6_alt.dezena[3:0]} part6_alt.dezena[3] part6_alt.dezena[2] part6_alt.dezena[1] part6_alt.dezena[0]
+#{part6_alt.unid[3:0]} part6_alt.unid[3] part6_alt.unid[2] part6_alt.unid[1] part6_alt.unid[0]
+@28
+#{part6_alt.HEX1[0:6]} part6_alt.HEX1[0] part6_alt.HEX1[1] part6_alt.HEX1[2] part6_alt.HEX1[3] part6_alt.HEX1[4] part6_alt.HEX1[5] part6_alt.HEX1[6]
+#{part6_alt.HEX0[0:6]} part6_alt.HEX0[0] part6_alt.HEX0[1] part6_alt.HEX0[2] part6_alt.HEX0[3] part6_alt.HEX0[4] part6_alt.HEX0[5] part6_alt.HEX0[6]
+[pattern_trace] 1
+[pattern_trace] 0

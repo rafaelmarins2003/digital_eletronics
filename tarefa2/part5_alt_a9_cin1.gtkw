@@ -1,0 +1,24 @@
+[*] GTKWave save file - Parte 5 alternativa: A=9, cin=1
+[dumpfile] "/home/rafaelmf/quartus/tarefa2/part5_alt.vcd"
+[timestart] 20000000
+[size] 1920 1000
+[pos] -1 -1
+*-9.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 200
+[signals_width] 160
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@28
+part5_alt.SW[8]
+@24
+#{part5_alt.A[3:0]} part5_alt.A[3] part5_alt.A[2] part5_alt.A[1] part5_alt.A[0]
+#{part5_alt.B[3:0]} part5_alt.B[3] part5_alt.B[2] part5_alt.B[1] part5_alt.B[0]
+#{part5_alt.S1[3:0]} part5_alt.S1[3] part5_alt.S1[2] part5_alt.S1[1] part5_alt.S1[0]
+#{part5_alt.S0[3:0]} part5_alt.S0[3] part5_alt.S0[2] part5_alt.S0[1] part5_alt.S0[0]
+@28
+#{part5_alt.HEX1[0:6]} part5_alt.HEX1[0] part5_alt.HEX1[1] part5_alt.HEX1[2] part5_alt.HEX1[3] part5_alt.HEX1[4] part5_alt.HEX1[5] part5_alt.HEX1[6]
+#{part5_alt.HEX0[0:6]} part5_alt.HEX0[0] part5_alt.HEX0[1] part5_alt.HEX0[2] part5_alt.HEX0[3] part5_alt.HEX0[4] part5_alt.HEX0[5] part5_alt.HEX0[6]
+#{part5_alt.HEX3[0:6]} part5_alt.HEX3[0] part5_alt.HEX3[1] part5_alt.HEX3[2] part5_alt.HEX3[3] part5_alt.HEX3[4] part5_alt.HEX3[5] part5_alt.HEX3[6]
+#{part5_alt.HEX2[0:6]} part5_alt.HEX2[0] part5_alt.HEX2[1] part5_alt.HEX2[2] part5_alt.HEX2[3] part5_alt.HEX2[4] part5_alt.HEX2[5] part5_alt.HEX2[6]
+[pattern_trace] 1
+[pattern_trace] 0

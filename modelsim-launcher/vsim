@@ -81,8 +81,12 @@ if [ "$1" = "-i" ]; then
     fi
 
     # nome bit_alto bit_baixo eh_vetor de cada porta de entrada (sem duplicar)
-    PORTS=$(cat "${SRCFILES[@]}" 2>/dev/null | awk '
+    # so as portas da entity do topo (o arquivo pode ter sub-entities)
+    PORTS=$(cat "${SRCFILES[@]}" 2>/dev/null | awk -v top="$TOP" '
         /^[ \t]*--/ { next }
+        tolower($0) ~ "^[ \t]*entity[ \t]+" tolower(top) "([ \t]+is|[ \t]*$)" { intop=1; next }
+        intop && tolower($0) ~ /^[ \t]*end[ \t;]/ { intop=0 }
+        !intop { next }
         /:[ \t]*[iI][nN][ \t]+/ {
             line=$0
             sub(/--.*/, "", line)
@@ -139,7 +143,8 @@ if [ "$1" = "-i" ]; then
     fi
 
     WORKDO="/tmp/nl_shim_$$.do"
-    : > "$WORKDO"
+    # erro no .do encerra o vsim -c em vez de deixa-lo esperando comando
+    echo "onerror {quit -f}" > "$WORKDO"
     # compilacao (reusa o .do do NativeLink se houver, senao compila tudo)
     if [ -n "$DOFILE" ] && [ -f "$DOFILE" ]; then
         cat "$DOFILE" >> "$WORKDO"
@@ -148,7 +153,10 @@ if [ "$1" = "-i" ]; then
 vlib rtl_work
 vmap work rtl_work
 EODO
+        # testbenches (*_tb.vhd) ficam de fora: dependem do topo e a ordem
+        # alfabetica os compilaria antes dele
         for f in "$PROJDIR"/*.vhd; do
+            case "$f" in *_tb.vhd) continue ;; esac
             [ -f "$f" ] && echo "vcom -93 -work work {$f}" >> "$WORKDO"
         done
     fi
@@ -181,4 +189,4 @@ EODO
 fi
 
 # demais usos (ex. -c batch): repassa com stderr limpo
-exec "$VDIR/vish" "$@" 2>/dev/null
+exec "$VDIR/vsim" "$@" 2>/dev/null

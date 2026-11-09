@@ -1,0 +1,22 @@
+[*] GTKWave save file - Parte 2 alternativa
+[dumpfile] "/home/rafaelmf/quartus/tarefa2/part2_alt.vcd"
+[timestart] 0
+[size] 1920 1000
+[pos] -1 -1
+*-9.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 200
+[signals_width] 160
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@24
+#{part2_alt.SW[3:0]} part2_alt.SW[3] part2_alt.SW[2] part2_alt.SW[1] part2_alt.SW[0]
+@28
+part2_alt.z
+@24
+#{part2_alt.A[3:0]} part2_alt.A[3] part2_alt.A[2] part2_alt.A[1] part2_alt.A[0]
+#{part2_alt.M[3:0]} part2_alt.M[3] part2_alt.M[2] part2_alt.M[1] part2_alt.M[0]
+@28
+#{part2_alt.HEX1[0:6]} part2_alt.HEX1[0] part2_alt.HEX1[1] part2_alt.HEX1[2] part2_alt.HEX1[3] part2_alt.HEX1[4] part2_alt.HEX1[5] part2_alt.HEX1[6]
+#{part2_alt.HEX0[0:6]} part2_alt.HEX0[0] part2_alt.HEX0[1] part2_alt.HEX0[2] part2_alt.HEX0[3] part2_alt.HEX0[4] part2_alt.HEX0[5] part2_alt.HEX0[6]
+[pattern_trace] 1
+[pattern_trace] 0
