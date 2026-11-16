@@ -1,0 +1,23 @@
+[*] GTKWave save file - Semaforo AV3, Parte 2
+[dumpfile] "/home/rafaelmf/quartus/trafficlight/trafficlight.vcd"
+[timestart] 0
+[size] 1920 1000
+[pos] -1 -1
+*-11.900000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 200
+[signals_width] 160
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@28
+trafficlight.clock
+trafficlight.clk_1s
+trafficlight.reset
+#{trafficlight.green[2:0]} trafficlight.green[2] trafficlight.green[1] trafficlight.green[0]
+#{trafficlight.red[2:0]} trafficlight.red[2] trafficlight.red[1] trafficlight.red[0]
+#{trafficlight.yellow[2:0]} trafficlight.yellow[2] trafficlight.yellow[1] trafficlight.yellow[0]
+@24
+#{trafficlight.counter[4:0]} trafficlight.counter[4] trafficlight.counter[3] trafficlight.counter[2] trafficlight.counter[1] trafficlight.counter[0]
+@28
+trafficlight.rst_counter
+[pattern_trace] 1
+[pattern_trace] 0

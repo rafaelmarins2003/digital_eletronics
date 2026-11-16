@@ -1,0 +1,219 @@
+VERSION = "1.0";
+HEADER
+(
+	GENERAL{
+		RMODE = "S";
+		RA_LEVEL = "H";
+		HOPT = "VHDL";
+	}
+
+	SPORT{
+		NAME = "clock";
+		PTYPE = "CI";
+		REG = "N";
+		OUTS = "N";
+	}
+
+	SPORT{
+		NAME = "reset";
+		PTYPE = "RI";
+		REG = "N";
+		OUTS = "N";
+	}
+
+	SPORT{
+		NAME = "counter[4:0]";
+		PTYPE = "OI";
+		REG = "N";
+		OUTS = "N";
+	}
+
+	SPORT{
+		NAME = "red[2:0]";
+		PTYPE = "OU";
+		REG = "N";
+		OUTS = "C";
+	}
+
+	SPORT{
+		NAME = "yellow[2:0]";
+		PTYPE = "OU";
+		REG = "N";
+		OUTS = "C";
+	}
+
+	SPORT{
+		NAME = "green[2:0]";
+		PTYPE = "OU";
+		REG = "N";
+		OUTS = "C";
+	}
+
+	SPORT{
+		NAME = "reset_counter";
+		PTYPE = "OU";
+		REG = "N";
+		OUTS = "C";
+	}
+
+	STATE{
+		NAME = "state1";
+		STYPE = "RE";
+		PT = (100,100);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "3";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "4";
+		COND = "";
+		OUTP = "reset_counter";
+		OUT_VALUE = "1";
+		COND = "counter == 21";
+	}
+
+	STATE{
+		NAME = "state2";
+		STYPE = "NR";
+		PT = (300,100);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "3";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "4";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+	}
+
+	STATE{
+		NAME = "state3";
+		STYPE = "NR";
+		PT = (500,100);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "5";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "2";
+		COND = "";
+	}
+
+	STATE{
+		NAME = "state4";
+		STYPE = "NR";
+		PT = (500,300);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "5";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "2";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+	}
+
+	STATE{
+		NAME = "state5";
+		STYPE = "NR";
+		PT = (300,300);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "6";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "1";
+		COND = "";
+	}
+
+	STATE{
+		NAME = "state6";
+		STYPE = "NR";
+		PT = (100,300);
+		OUTP = "red[2:0]";
+		OUT_VALUE = "6";
+		COND = "";
+		OUTP = "yellow[2:0]";
+		OUT_VALUE = "1";
+		COND = "";
+		OUTP = "green[2:0]";
+		OUT_VALUE = "0";
+		COND = "";
+	}
+
+	TRANS{
+		SSTATE = "state1";
+		DSTATE = "state2";
+		EQ = "counter == 5";
+		PT = (150,125);
+		PT = (200,125);
+		PT = (250,125);
+		PT = (300,125);
+		PT = (190,105);
+	}
+
+	TRANS{
+		SSTATE = "state2";
+		DSTATE = "state3";
+		EQ = "counter == 7";
+		PT = (350,125);
+		PT = (400,125);
+		PT = (450,125);
+		PT = (500,125);
+		PT = (390,105);
+	}
+
+	TRANS{
+		SSTATE = "state3";
+		DSTATE = "state4";
+		EQ = "counter == 12";
+		PT = (525,150);
+		PT = (525,200);
+		PT = (525,250);
+		PT = (525,300);
+		PT = (533,217);
+	}
+
+	TRANS{
+		SSTATE = "state4";
+		DSTATE = "state5";
+		EQ = "counter == 14";
+		PT = (500,325);
+		PT = (450,325);
+		PT = (400,325);
+		PT = (350,325);
+		PT = (390,305);
+	}
+
+	TRANS{
+		SSTATE = "state5";
+		DSTATE = "state6";
+		EQ = "counter == 19";
+		PT = (300,325);
+		PT = (250,325);
+		PT = (200,325);
+		PT = (150,325);
+		PT = (190,305);
+	}
+
+	TRANS{
+		SSTATE = "state6";
+		DSTATE = "state1";
+		EQ = "counter == 21";
+		PT = (125,300);
+		PT = (125,250);
+		PT = (125,200);
+		PT = (125,150);
+		PT = (133,217);
+	}
+
+)
+END
